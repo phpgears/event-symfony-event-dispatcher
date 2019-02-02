@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Gears\Event\Symfony\Tests;
 
 use Gears\Event\EventHandler;
-use Gears\Event\Symfony\EventDispatcher;
+use Gears\Event\Symfony\Dispatcher;
 use Gears\Event\Symfony\EventEnvelope;
 use Gears\Event\Symfony\Tests\Stub\EventStub;
 use Gears\Event\Symfony\Tests\Stub\EventSubscriberInterfaceStub;
@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Symfony event dispatcher wrapper test.
  */
-class EventDispatcherTest extends TestCase
+class DispatcherTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -32,7 +32,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testInvalidListener(): void
     {
-        new EventDispatcher(['eventName' => new \stdClass()]);
+        new Dispatcher(['eventName' => new \stdClass()]);
     }
 
     /**
@@ -41,7 +41,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testEmptyEvent(): void
     {
-        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher = new Dispatcher();
 
         $eventDispatcher->dispatch('eventName');
     }
@@ -52,7 +52,7 @@ class EventDispatcherTest extends TestCase
      */
     public function testInvalidEvent(): void
     {
-        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher = new Dispatcher();
 
         $eventDispatcher->dispatch('eventName', new Event());
     }
@@ -76,7 +76,7 @@ class EventDispatcherTest extends TestCase
             'otherEvent' => [$eventHandler],
         ]);
 
-        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher = new Dispatcher();
         $eventDispatcher->addSubscriber($subscriber);
 
         $eventDispatcher->dispatch('eventName', new EventEnvelope($event));

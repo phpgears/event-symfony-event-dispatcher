@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Gears\Event\Symfony\Tests;
 
 use Gears\Event\EventHandler;
-use Gears\Event\Symfony\ContainerAwareEventDispatcher;
+use Gears\Event\Symfony\ContainerAwareDispatcher;
 use Gears\Event\Symfony\EventEnvelope;
 use Gears\Event\Symfony\Tests\Stub\EventStub;
 use Gears\Event\Symfony\Tests\Stub\EventSubscriberInterfaceStub;
@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Symfony event dispatcher wrapper test.
  */
-class ContainerAwareEventDispatcherTest extends TestCase
+class ContainerAwareDispatcherTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -38,7 +38,7 @@ class ContainerAwareEventDispatcherTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        new ContainerAwareEventDispatcher($containerMock, ['eventName' => new \stdClass()]);
+        new ContainerAwareDispatcher($containerMock, ['eventName' => new \stdClass()]);
     }
 
     /**
@@ -52,7 +52,7 @@ class ContainerAwareEventDispatcherTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $eventDispatcher = new ContainerAwareEventDispatcher($containerMock);
+        $eventDispatcher = new ContainerAwareDispatcher($containerMock);
 
         $eventDispatcher->dispatch('eventName');
     }
@@ -68,7 +68,7 @@ class ContainerAwareEventDispatcherTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $eventDispatcher = new ContainerAwareEventDispatcher($containerMock);
+        $eventDispatcher = new ContainerAwareDispatcher($containerMock);
 
         $eventDispatcher->dispatch('eventName', new Event());
     }
@@ -87,7 +87,7 @@ class ContainerAwareEventDispatcherTest extends TestCase
             ->with('eventHandler')
             ->will($this->returnValue('thisIsNoHandler'));
         /** @var ContainerInterface $containerMock */
-        $eventDispatcher = new ContainerAwareEventDispatcher($containerMock, ['eventName' => 'eventHandler']);
+        $eventDispatcher = new ContainerAwareDispatcher($containerMock, ['eventName' => 'eventHandler']);
 
         $eventDispatcher->dispatch('eventName', new EventEnvelope(EventStub::instance()));
     }
@@ -119,7 +119,7 @@ class ContainerAwareEventDispatcherTest extends TestCase
             ],
         ]);
 
-        $eventDispatcher = new ContainerAwareEventDispatcher($containerMock);
+        $eventDispatcher = new ContainerAwareDispatcher($containerMock);
         $eventDispatcher->addSubscriber($subscriber);
 
         $eventDispatcher->dispatch('eventName', new EventEnvelope($event));

@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContainerAwareEventDispatcher extends SymfonyEventDispatcher
+class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDispatcher
 {
     /**
      * @var ContainerInterface
@@ -48,7 +48,9 @@ class ContainerAwareEventDispatcher extends SymfonyEventDispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * Adds an event subscriber.
+     *
+     * @param EventSubscriberInterface $subscriber
      */
     public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
@@ -70,9 +72,9 @@ class ContainerAwareEventDispatcher extends SymfonyEventDispatcher
     /**
      * Adds an event listener that listens on the specified events.
      *
-     * @param string $eventName
-     * @param mixed  $listener
-     * @param mixed  $priority
+     * @param string          $eventName
+     * @param callable|string $listener
+     * @param int             $priority
      */
     public function addListener($eventName, $listener, $priority = 0): void
     {
@@ -83,7 +85,7 @@ class ContainerAwareEventDispatcher extends SymfonyEventDispatcher
             ));
         }
 
-        parent::addListener($eventName, $listener, (int) $priority);
+        parent::addListener($eventName, $listener, $priority);
     }
 
     /**

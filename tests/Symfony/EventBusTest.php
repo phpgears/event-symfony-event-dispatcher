@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gears\Event\Symfony\Tests;
 
-use Gears\Event\Symfony\ContainerAwareEventDispatcher;
+use Gears\Event\Symfony\ContainerAwareDispatcher;
 use Gears\Event\Symfony\EventBus;
 use Gears\Event\Symfony\Tests\Stub\EventStub;
 use PHPUnit\Framework\TestCase;
@@ -25,12 +25,12 @@ class EventBusTest extends TestCase
 {
     public function testHandling(): void
     {
-        $eventDispatcherMock = $this->getMockBuilder(ContainerAwareEventDispatcher::class)
+        $eventDispatcherMock = $this->getMockBuilder(ContainerAwareDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
         $eventDispatcherMock->expects($this->once())
             ->method('dispatch');
-        /* @var ContainerAwareEventDispatcher $eventDispatcherMock */
+        /* @var ContainerAwareDispatcher $eventDispatcherMock */
 
         (new EventBus($eventDispatcherMock))->dispatch(EventStub::instance());
     }

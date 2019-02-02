@@ -8,4 +8,4 @@ parameters:
   paths:
     - src
   ignoreErrors:
-    - '/^Parameter #2 \$listener of method .+\\EventDispatcher::addListener\(\) expects callable, .+ given.$/'
+    - '/^Parameter #2 \$listener of method .+\\EventDispatcher::addListener\(\) expects callable\(\): mixed, .+ given.$/'
