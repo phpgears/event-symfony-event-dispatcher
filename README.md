@@ -33,16 +33,16 @@ require './vendor/autoload.php';
 ### Events Bus
 
 ```php
-use Gears\Event\Symfony\ContainerAwareEventDispatcher;
-use Gears\Event\Symfony\EventBus;
-use Gears\Event\Symfony\EventDispatcher;
+use Gears\Event\Symfony\Dispatcher\ContainerAwareDispatcher;
+use Gears\Event\Symfony\Dispatcher\EventBus;
+use Gears\Event\Symfony\Dispatcher\Dispatcher;
 
 $eventToHandlerMap = [];
 
-$symfonyDispatcher = new EventDispatcher($eventToHandlerMap);
+$symfonyDispatcher = new Dispatcher($eventToHandlerMap);
 // OR
 /** @var \Psr\Container\ContainerInterface $container */
-$symfonyDispatcher = new ContainerAwareEventDispatcher($container, $eventToHandlerMap);
+$symfonyDispatcher = new ContainerAwareDispatcher($container, $eventToHandlerMap);
 
 $eventBus = new EventBus($symfonyDispatcher);
 

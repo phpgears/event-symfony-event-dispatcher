@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace Gears\Event\Symfony\Tests;
+namespace Gears\Event\Symfony\Dispatcher\Tests;
 
-use Gears\Event\Symfony\ContainerAwareDispatcher;
-use Gears\Event\Symfony\EventBus;
-use Gears\Event\Symfony\Tests\Stub\EventStub;
+use Gears\Event\Symfony\Dispatcher\ContainerAwareDispatcher;
+use Gears\Event\Symfony\Dispatcher\EventBus;
+use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Gears\Event\Symfony\Tests\Stub;
+namespace Gears\Event\Symfony\Dispatcher\Tests\Stub;
 
 use Gears\Event\AbstractEmptyEvent;
 

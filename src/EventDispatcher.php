@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Gears\Event\Symfony;
+namespace Gears\Event\Symfony\Dispatcher;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

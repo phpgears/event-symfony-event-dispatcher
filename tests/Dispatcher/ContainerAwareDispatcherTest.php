@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace Gears\Event\Symfony\Tests;
+namespace Gears\Event\Symfony\Dispatcher\Tests;
 
 use Gears\Event\EventHandler;
-use Gears\Event\Symfony\ContainerAwareDispatcher;
-use Gears\Event\Symfony\EventEnvelope;
-use Gears\Event\Symfony\Tests\Stub\EventStub;
-use Gears\Event\Symfony\Tests\Stub\EventSubscriberInterfaceStub;
+use Gears\Event\Symfony\Dispatcher\ContainerAwareDispatcher;
+use Gears\Event\Symfony\Dispatcher\EventEnvelope;
+use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
+use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventSubscriberInterfaceStub;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;

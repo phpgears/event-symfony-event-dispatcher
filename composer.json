@@ -46,12 +46,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Gears\\Event\\Symfony\\": "src/"
+      "Gears\\Event\\Symfony\\Dispatcher\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Gears\\Event\\Symfony\\Tests\\": "tests/Symfony/"
+      "Gears\\Event\\Symfony\\Dispatcher\\Tests\\": "tests/Dispatcher/"
     }
   },
   "bin": [

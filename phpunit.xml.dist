@@ -14,7 +14,7 @@
 >
     <testsuites>
         <testsuite name="event-symfony-event-dispatcher test suite">
-            <directory>tests/Symfony/</directory>
+            <directory>tests/Dispatcher/</directory>
         </testsuite>
     </testsuites>
 

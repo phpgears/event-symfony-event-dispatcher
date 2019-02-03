@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace Gears\Event\Symfony\Tests;
+namespace Gears\Event\Symfony\Dispatcher\Tests;
 
-use Gears\Event\Symfony\EventEnvelope;
-use Gears\Event\Symfony\Tests\Stub\EventStub;
+use Gears\Event\Symfony\Dispatcher\EventEnvelope;
+use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
 use PHPUnit\Framework\TestCase;
 
 /**
