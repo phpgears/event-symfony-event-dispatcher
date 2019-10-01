@@ -20,33 +20,31 @@ use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
 use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventSubscriberInterfaceStub;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Symfony event dispatcher wrapper test.
  */
 class ContainerAwareDispatcherTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Event handler must be a container entry, stdClass given
-     */
     public function testInvalidListener(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Event handler must be a container entry, stdClass given');
+
         /** @var ContainerInterface $containerMock */
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        new ContainerAwareDispatcher($containerMock, ['eventName' => new \stdClass()]);
+        new ContainerAwareDispatcher($containerMock, [\stdClass::class => new \stdClass()]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Dispatched event cannot be empty
-     */
     public function testEmptyEvent(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Dispatched event cannot be empty');
+
         /** @var ContainerInterface $containerMock */
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()
@@ -54,15 +52,14 @@ class ContainerAwareDispatcherTest extends TestCase
 
         $eventDispatcher = new ContainerAwareDispatcher($containerMock);
 
-        $eventDispatcher->dispatch('eventName');
+        $eventDispatcher->dispatch(null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^Dispatched event must implement .+\\EventEnvelope, .+ given$/
-     */
     public function testInvalidEvent(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/^Dispatched event must implement .+\\\EventEnvelope, .+ given$/');
+
         /** @var ContainerInterface $containerMock */
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()
@@ -70,26 +67,25 @@ class ContainerAwareDispatcherTest extends TestCase
 
         $eventDispatcher = new ContainerAwareDispatcher($containerMock);
 
-        $eventDispatcher->dispatch('eventName', new Event());
+        $eventDispatcher->dispatch(new Event());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Event handler should implement Gears\Event\EventHandler, string given
-     */
     public function testInvalidHandler(): void
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Event handler should implement Gears\Event\EventHandler, string given');
+
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $containerMock->expects($this->once())
+        $containerMock->expects(static::once())
             ->method('get')
             ->with('eventHandler')
-            ->will($this->returnValue('thisIsNoHandler'));
+            ->will(static::returnValue('thisIsNoHandler'));
         /** @var ContainerInterface $containerMock */
-        $eventDispatcher = new ContainerAwareDispatcher($containerMock, ['eventName' => 'eventHandler']);
+        $eventDispatcher = new ContainerAwareDispatcher($containerMock, [EventStub::class => 'eventHandler']);
 
-        $eventDispatcher->dispatch('eventName', new EventEnvelope(EventStub::instance()));
+        $eventDispatcher->dispatch(new EventEnvelope(EventStub::instance()));
     }
 
     public function testEventDispatch(): void
@@ -99,29 +95,23 @@ class ContainerAwareDispatcherTest extends TestCase
         $eventHandler = $this->getMockBuilder(EventHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $eventHandler->expects($this->once())
+        $eventHandler->expects(static::once())
             ->method('handle')
             ->with($event);
 
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $containerMock->expects($this->once())
+        $containerMock->expects(static::once())
             ->method('get')
             ->with('eventHandler')
-            ->will($this->returnValue($eventHandler));
+            ->will(static::returnValue($eventHandler));
         /** @var ContainerInterface $containerMock */
-        $subscriber = new EventSubscriberInterfaceStub([
-            'eventName' => 'eventHandler',
-            'otherEvent' => ['eventHandler'],
-            'anotherEvent' => [
-                ['eventHandler'],
-            ],
-        ]);
+        $subscriber = new EventSubscriberInterfaceStub([EventStub::class => 'eventHandler']);
 
         $eventDispatcher = new ContainerAwareDispatcher($containerMock);
         $eventDispatcher->addSubscriber($subscriber);
 
-        $eventDispatcher->dispatch('eventName', new EventEnvelope($event));
+        $eventDispatcher->dispatch(new EventEnvelope($event));
     }
 }

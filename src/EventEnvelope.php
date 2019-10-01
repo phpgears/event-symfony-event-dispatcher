@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Gears\Event\Symfony\Dispatcher;
 
 use Gears\Event\Event;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 final class EventEnvelope extends SymfonyEvent
 {

@@ -28,6 +28,6 @@ class EventEnvelopeTest extends TestCase
 
         $eventEnvelope = new EventEnvelope($event);
 
-        $this->assertSame($event, $eventEnvelope->getWrappedEvent());
+        static::assertSame($event, $eventEnvelope->getWrappedEvent());
     }
 }

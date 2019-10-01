@@ -28,7 +28,7 @@ class EventBusTest extends TestCase
         $eventDispatcherMock = $this->getMockBuilder(ContainerAwareDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcherMock->expects($this->once())
+        $eventDispatcherMock->expects(static::once())
             ->method('dispatch');
         /* @var ContainerAwareDispatcher $eventDispatcherMock */
 

@@ -14,7 +14,16 @@ declare(strict_types=1);
 namespace Gears\Event\Symfony\Dispatcher;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 interface EventDispatcher extends EventDispatcherInterface
 {
+    /**
+     * Dispatches an event to all registered listeners.
+     *
+     * @param mixed $eventEnvelope
+     *
+     * @return SymfonyEvent
+     */
+    public function dispatch($eventEnvelope): SymfonyEvent;
 }

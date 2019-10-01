@@ -21,14 +21,14 @@ final class EventBus implements EventBusInterface
     /**
      * Wrapped event dispatcher.
      *
-     * @var ContainerAwareDispatcher
+     * @var EventDispatcher
      */
     private $wrappedDispatcher;
 
     /**
      * EventBus constructor.
      *
-     * @param ContainerAwareDispatcher $wrappedDispatcher
+     * @param EventDispatcher $wrappedDispatcher
      */
     public function __construct(EventDispatcher $wrappedDispatcher)
     {
@@ -40,6 +40,6 @@ final class EventBus implements EventBusInterface
      */
     public function dispatch(Event $event): void
     {
-        $this->wrappedDispatcher->dispatch(\get_class($event), new EventEnvelope($event));
+        $this->wrappedDispatcher->dispatch(new EventEnvelope($event));
     }
 }

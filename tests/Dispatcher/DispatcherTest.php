@@ -19,42 +19,41 @@ use Gears\Event\Symfony\Dispatcher\EventEnvelope;
 use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
 use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventSubscriberInterfaceStub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Symfony event dispatcher wrapper test.
  */
 class DispatcherTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^Event handler must be an instance of .+\\EventHandler, stdClass given$/
-     */
     public function testInvalidListener(): void
     {
-        new Dispatcher(['eventName' => new \stdClass()]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp(
+            '/^Event handler must be an instance of .+\\\EventHandler, stdClass given$/'
+        );
+
+        new Dispatcher([\stdClass::class => new \stdClass()]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Dispatched event cannot be empty
-     */
     public function testEmptyEvent(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Dispatched event cannot be empty');
+
         $eventDispatcher = new Dispatcher();
 
-        $eventDispatcher->dispatch('eventName');
+        $eventDispatcher->dispatch(null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /^Dispatched event must implement .+\\EventEnvelope, .+ given$/
-     */
     public function testInvalidEvent(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/^Dispatched event must implement .+\\\EventEnvelope, .+ given$/');
+
         $eventDispatcher = new Dispatcher();
 
-        $eventDispatcher->dispatch('eventName', new Event());
+        $eventDispatcher->dispatch(new Event());
     }
 
     public function testEventDispatch(): void
@@ -64,21 +63,19 @@ class DispatcherTest extends TestCase
         $eventHandler = $this->getMockBuilder(EventHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $eventHandler->expects($this->once())
+        $eventHandler->expects(static::once())
             ->method('handle')
             ->with($event);
 
         $subscriber = new EventSubscriberInterfaceStub([
-            'eventName' => [
+            EventStub::class => [
                 [$eventHandler],
             ],
-            'anotherEvent' => $eventHandler,
-            'otherEvent' => [$eventHandler],
         ]);
 
         $eventDispatcher = new Dispatcher();
         $eventDispatcher->addSubscriber($subscriber);
 
-        $eventDispatcher->dispatch('eventName', new EventEnvelope($event));
+        $eventDispatcher->dispatch(new EventEnvelope($event));
     }
 }

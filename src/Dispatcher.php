@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Gears\Event\Symfony\Dispatcher;
 
 use Gears\Event\EventHandler;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
 class Dispatcher extends SymfonyEventDispatcher implements EventDispatcher
 {
@@ -27,6 +27,8 @@ class Dispatcher extends SymfonyEventDispatcher implements EventDispatcher
      */
     public function __construct(array $listenersMap = [])
     {
+        parent::__construct();
+
         foreach ($listenersMap as $eventName => $listeners) {
             if (!\is_array($listeners)) {
                 $listeners = [$listeners];
@@ -79,25 +81,30 @@ class Dispatcher extends SymfonyEventDispatcher implements EventDispatcher
     }
 
     /**
-     * {@inheritdoc}
+     * Dispatches an event to all registered listeners.
+     *
+     * @param mixed $eventEnvelope
+     *
+     * @return SymfonyEvent
      */
-    public function dispatch($eventName, SymfonyEvent $event = null): SymfonyEvent
+    public function dispatch($eventEnvelope): SymfonyEvent
     {
-        if ($event === null) {
+        if ($eventEnvelope === null) {
             throw new \InvalidArgumentException('Dispatched event cannot be empty');
         }
 
-        if (!$event instanceof EventEnvelope) {
+        if (!$eventEnvelope instanceof EventEnvelope) {
             throw new \InvalidArgumentException(\sprintf(
                 'Dispatched event must implement %s, %s given',
                 EventEnvelope::class,
-                \get_class($event)
+                \get_class($eventEnvelope)
             ));
         }
 
-        $this->dispatchEvent($this->getListeners($eventName), $event);
+        $eventName = \get_class($eventEnvelope->getWrappedEvent());
+        $this->dispatchEvent($this->getListeners($eventName), $eventEnvelope);
 
-        return $event;
+        return $eventEnvelope;
     }
 
     /**
