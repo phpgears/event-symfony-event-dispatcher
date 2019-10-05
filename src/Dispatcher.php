@@ -71,7 +71,7 @@ class Dispatcher extends SymfonyEventDispatcher implements EventDispatcher
     {
         if (!$listener instanceof EventHandler) {
             throw new \InvalidArgumentException(\sprintf(
-                'Event handler must be an instance of %s, %s given',
+                'Event handler must be an instance of "%s", "%s" given',
                 EventHandler::class,
                 \is_object($listener) ? \get_class($listener) : \gettype($listener)
             ));
@@ -95,14 +95,14 @@ class Dispatcher extends SymfonyEventDispatcher implements EventDispatcher
 
         if (!$eventEnvelope instanceof EventEnvelope) {
             throw new \InvalidArgumentException(\sprintf(
-                'Dispatched event must implement %s, %s given',
+                'Dispatched event must implement "%s", "%s" given',
                 EventEnvelope::class,
                 \get_class($eventEnvelope)
             ));
         }
 
-        $eventName = \get_class($eventEnvelope->getWrappedEvent());
-        $this->dispatchEvent($this->getListeners($eventName), $eventEnvelope);
+        $eventListeners = $this->getListeners($eventEnvelope->getWrappedEvent()->getEventType());
+        $this->dispatchEvent($eventListeners, $eventEnvelope);
 
         return $eventEnvelope;
     }

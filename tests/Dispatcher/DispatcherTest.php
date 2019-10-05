@@ -30,7 +30,7 @@ class DispatcherTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp(
-            '/^Event handler must be an instance of .+\\\EventHandler, stdClass given$/'
+            '/^Event handler must be an instance of ".+\\\EventHandler", "stdClass" given$/'
         );
 
         new Dispatcher([\stdClass::class => new \stdClass()]);
@@ -49,7 +49,7 @@ class DispatcherTest extends TestCase
     public function testInvalidEvent(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/^Dispatched event must implement .+\\\EventEnvelope, .+ given$/');
+        $this->expectExceptionMessageRegExp('/^Dispatched event must implement ".+\\\EventEnvelope", ".+" given$/');
 
         $eventDispatcher = new Dispatcher();
 

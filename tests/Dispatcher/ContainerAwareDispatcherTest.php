@@ -30,7 +30,7 @@ class ContainerAwareDispatcherTest extends TestCase
     public function testInvalidListener(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Event handler must be a container entry, stdClass given');
+        $this->expectExceptionMessage('Event handler must be a container entry, "stdClass" given');
 
         /** @var ContainerInterface $containerMock */
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
@@ -58,7 +58,7 @@ class ContainerAwareDispatcherTest extends TestCase
     public function testInvalidEvent(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/^Dispatched event must implement .+\\\EventEnvelope, .+ given$/');
+        $this->expectExceptionMessageRegExp('/^Dispatched event must implement ".+\\\EventEnvelope", ".+" given$/');
 
         /** @var ContainerInterface $containerMock */
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
@@ -73,7 +73,7 @@ class ContainerAwareDispatcherTest extends TestCase
     public function testInvalidHandler(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Event handler should implement Gears\Event\EventHandler, string given');
+        $this->expectExceptionMessage('Event handler should implement "Gears\Event\EventHandler", "string" given');
 
         $containerMock = $this->getMockBuilder(ContainerInterface::class)
             ->disableOriginalConstructor()

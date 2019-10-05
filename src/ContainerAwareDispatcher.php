@@ -82,7 +82,7 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
     {
         if (!\is_string($listener)) {
             throw new \InvalidArgumentException(\sprintf(
-                'Event handler must be a container entry, %s given',
+                'Event handler must be a container entry, "%s" given',
                 \is_object($listener) ? \get_class($listener) : \gettype($listener)
             ));
         }
@@ -105,14 +105,14 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
 
         if (!$eventEnvelope instanceof EventEnvelope) {
             throw new \InvalidArgumentException(\sprintf(
-                'Dispatched event must implement %s, %s given',
+                'Dispatched event must implement "%s", "%s" given',
                 EventEnvelope::class,
                 \get_class($eventEnvelope)
             ));
         }
 
-        $eventName = \get_class($eventEnvelope->getWrappedEvent());
-        $this->dispatchEvent($this->getListeners($eventName), $eventEnvelope);
+        $eventListeners = $this->getListeners($eventEnvelope->getWrappedEvent()->getEventType());
+        $this->dispatchEvent($eventListeners, $eventEnvelope);
 
         return $eventEnvelope;
     }
@@ -133,7 +133,7 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
 
             if (!$handler instanceof EventHandler) {
                 throw new \RuntimeException(\sprintf(
-                    'Event handler should implement %s, %s given',
+                    'Event handler should implement "%s", "%s" given',
                     EventHandler::class,
                     \is_object($handler) ? \get_class($handler) : \gettype($handler)
                 ));
