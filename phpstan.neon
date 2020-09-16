@@ -2,5 +2,3 @@ parameters:
   level: max
   paths:
     - src
-  ignoreErrors:
-    - '/^Parameter #2 \$listener of method .+\\EventDispatcher::addListener\(\) expects callable\(\): mixed, .+ given.$/'

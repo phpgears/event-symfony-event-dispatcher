@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace Gears\Event\Symfony\Dispatcher;
 
+use Gears\Event\Event;
 use Gears\Event\EventHandler;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
-class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDispatcher
+class ContainerAwareDispatcher extends Dispatcher
 {
     /**
      * @var ContainerInterface
@@ -29,56 +27,24 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
     /**
      * ContainerAwareEventDispatcher constructor.
      *
-     * @param ContainerInterface   $container
-     * @param array<string, mixed> $listenersMap
+     * @param ContainerInterface            $container
+     * @param array<string, mixed>          $listenersMap
+     * @param array<AsyncEventQueueHandler> $asyncEventHandlers
      */
-    public function __construct(ContainerInterface $container, array $listenersMap = [])
-    {
-        parent::__construct();
+    public function __construct(
+        ContainerInterface $container,
+        array $listenersMap = [],
+        array $asyncEventHandlers = []
+    ) {
+        parent::__construct($listenersMap, $asyncEventHandlers);
 
         $this->container = $container;
-
-        foreach ($listenersMap as $eventName => $listeners) {
-            if (!\is_array($listeners)) {
-                $listeners = [$listeners];
-            }
-
-            foreach ($listeners as $listener) {
-                $this->addListener($eventName, $listener);
-            }
-        }
     }
 
     /**
-     * Adds an event subscriber.
-     *
-     * @param EventSubscriberInterface $subscriber
+     * {@inheritdoc}
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber): void
-    {
-        foreach ($subscriber::getSubscribedEvents() as $eventName => $params) {
-            if (!\is_array($params)) {
-                $params = [$params];
-            }
-
-            foreach ($params as $listener) {
-                if (\is_string($listener)) {
-                    $this->addListener($eventName, $listener);
-                } else {
-                    $this->addListener($eventName, $listener[0], $listener[1] ?? 0);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds an event listener that listens on the specified events.
-     *
-     * @param string          $eventName
-     * @param callable|string $listener
-     * @param int             $priority
-     */
-    public function addListener($eventName, $listener, $priority = 0): void
+    protected function assertListenerType($listener): void
     {
         if (!\is_string($listener)) {
             throw new \InvalidArgumentException(\sprintf(
@@ -86,49 +52,15 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
                 \is_object($listener) ? \get_class($listener) : \gettype($listener)
             ));
         }
-
-        parent::addListener($eventName, $listener, $priority);
     }
 
     /**
-     * Dispatches an event to all registered listeners.
-     *
-     * @param mixed $eventEnvelope
-     *
-     * @return SymfonyEvent
+     * {@inheritdoc}
      */
-    public function dispatch($eventEnvelope): SymfonyEvent
+    protected function dispatchEvent(iterable $listeners, Event $event): void
     {
-        if ($eventEnvelope === null) {
-            throw new \InvalidArgumentException('Dispatched event cannot be empty');
-        }
-
-        if (!$eventEnvelope instanceof EventEnvelope) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Dispatched event must implement "%s", "%s" given',
-                EventEnvelope::class,
-                \get_class($eventEnvelope)
-            ));
-        }
-
-        $eventListeners = $this->getListeners($eventEnvelope->getWrappedEvent()->getEventType());
-        $this->dispatchEvent($eventListeners, $eventEnvelope);
-
-        return $eventEnvelope;
-    }
-
-    /**
-     * Dispatch event to registered listeners.
-     *
-     * @param string[]      $listeners
-     * @param EventEnvelope $event
-     */
-    private function dispatchEvent(array $listeners, EventEnvelope $event): void
-    {
-        $dispatchEvent = $event->getWrappedEvent();
-
+        /** @var string $listener */
         foreach ($listeners as $listener) {
-            /* @var EventHandler $handler */
             $handler = $this->container->get($listener);
 
             if (!$handler instanceof EventHandler) {
@@ -139,7 +71,7 @@ class ContainerAwareDispatcher extends SymfonyEventDispatcher implements EventDi
                 ));
             }
 
-            $handler->handle($dispatchEvent);
+            $handler->handle($event);
         }
     }
 }

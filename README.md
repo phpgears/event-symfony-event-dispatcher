@@ -50,6 +50,76 @@ $eventBus = new EventBus($symfonyDispatcher);
 $eventBus->dispatch($event);
 ```
 
+#### Asynchronicity
+
+To allow events to be handled asynchronously you should include `Gears\Event\Symfony\Dispatcher\AsyncEventHandler` in dispatcher's constructor
+
+AsyncEventHandler requires an implementation of `Gears\Event\Async\EventQueue` which will be responsible for event queueing and an instance of `Gears\Event\Async\Discriminator\EventDiscriminator` used to discriminate which events should be queued
+
+```php
+use Gears\Event\Async\Discriminator\ParameterEventDiscriminator;
+use Gears\Event\Async\Serializer\NativePhpEventSerializer;
+use Gears\Event\Symfony\Dispatcher\AsyncEventQueueHandler;
+use Gears\Event\Symfony\Dispatcher\ContainerAwareDispatcher;
+use Gears\Event\Symfony\Dispatcher\EventBus;
+use Gears\Event\Symfony\Dispatcher\Dispatcher;
+
+/* @var \Gears\Event\Async\EventQueue $eventQueue */
+$eventQueue = new EventQueueImplementation(new NativePhpEventSerializer());
+
+$asyncEventHandler = new AsyncEventQueueHandler($eventQueue, new ParameterEventDiscriminator('async'));
+
+$eventToHandlerMap = [];
+
+$symfonyDispatcher = new Dispatcher($eventToHandlerMap, [$asyncEventHandler]);
+// OR
+/** @var \Psr\Container\ContainerInterface $container */
+$symfonyDispatcher = new ContainerAwareDispatcher($container, $eventToHandlerMap, [$asyncEventHandler]);
+
+$eventBus = new EventBus($symfonyDispatcher);
+
+/** @var \Gears\Event\Event $event */
+$eventBus->dispatch($event);
+```
+
+If you'd like to send different events to different message queues you can just add more instances of AsyncEventQueueHandler
+
+To know more about how to create and configure an EventQueue head to [phpgears/event-async](https://github.com/phpgears/event-async)
+
+##### Dequeueing
+
+This part is highly dependent on your message queue, though event serializers can be used to deserialize queue messages
+
+This is just an example of the process
+
+```php
+use Gears\Event\Async\Serializer\NativePhpEventSerializer;
+use Gears\Event\Symfony\Dispatcher\ContainerAwareDispatcher;
+use Gears\Event\Symfony\Dispatcher\EventBus;
+use Gears\Event\Symfony\Dispatcher\Dispatcher;
+
+$eventToHandlerMap = [];
+
+$symfonyDispatcher = new Dispatcher($eventToHandlerMap);
+// OR
+/** @var \Psr\Container\ContainerInterface $container */
+$symfonyDispatcher = new ContainerAwareDispatcher($container, $eventToHandlerMap);
+
+$eventBus = new EventBus($symfonyDispatcher);
+$serializer = new NativePhpEventSerializer();
+
+while (true) {
+    /* @var your_message_queue_manager $queue */
+    $message = $queue->getMessage(); // extract messages from queue
+
+    if ($message !== null) {
+        $event = $serializer->fromSerialized($message);
+
+        $eventBus->dispatch($event);
+    }
+}
+```
+
 ## Contributing
 
 Found a bug or have a feature request? [Please open a new issue](https://github.com/phpgears/event-symfony-event-dispatcher/issues). Have a look at existing issues before.

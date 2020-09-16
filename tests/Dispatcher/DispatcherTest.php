@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Gears\Event\Symfony\Dispatcher\Tests;
 
+use Gears\Event\Async\Discriminator\EventDiscriminator;
+use Gears\Event\Async\EventQueue;
 use Gears\Event\EventHandler;
+use Gears\Event\Symfony\Dispatcher\AsyncEventQueueHandler;
 use Gears\Event\Symfony\Dispatcher\Dispatcher;
 use Gears\Event\Symfony\Dispatcher\EventEnvelope;
 use Gears\Event\Symfony\Dispatcher\Tests\Stub\EventStub;
@@ -60,6 +63,18 @@ class DispatcherTest extends TestCase
     {
         $event = EventStub::instance();
 
+        $eventQueue = $this->getMockBuilder(EventQueue::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $eventDiscriminator = $this->getMockBuilder(EventDiscriminator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $eventDiscriminator->expects(static::once())
+            ->method('shouldEnqueue')
+            ->willReturn(false);
+        $asyncEventHandler = new AsyncEventQueueHandler($eventQueue, $eventDiscriminator);
+
+
         $eventHandler = $this->getMockBuilder(EventHandler::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,7 +88,7 @@ class DispatcherTest extends TestCase
             ],
         ]);
 
-        $eventDispatcher = new Dispatcher();
+        $eventDispatcher = new Dispatcher([], [$asyncEventHandler]);
         $eventDispatcher->addSubscriber($subscriber);
 
         $eventDispatcher->dispatch(new EventEnvelope($event));

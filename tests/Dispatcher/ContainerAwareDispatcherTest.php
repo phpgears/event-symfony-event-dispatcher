@@ -40,36 +40,6 @@ class ContainerAwareDispatcherTest extends TestCase
         new ContainerAwareDispatcher($containerMock, [\stdClass::class => new \stdClass()]);
     }
 
-    public function testEmptyEvent(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Dispatched event cannot be empty');
-
-        /** @var ContainerInterface $containerMock */
-        $containerMock = $this->getMockBuilder(ContainerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $eventDispatcher = new ContainerAwareDispatcher($containerMock);
-
-        $eventDispatcher->dispatch(null);
-    }
-
-    public function testInvalidEvent(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/^Dispatched event must implement ".+\\\EventEnvelope", ".+" given$/');
-
-        /** @var ContainerInterface $containerMock */
-        $containerMock = $this->getMockBuilder(ContainerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $eventDispatcher = new ContainerAwareDispatcher($containerMock);
-
-        $eventDispatcher->dispatch(new Event());
-    }
-
     public function testInvalidHandler(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -81,7 +51,7 @@ class ContainerAwareDispatcherTest extends TestCase
         $containerMock->expects(static::once())
             ->method('get')
             ->with('eventHandler')
-            ->will(static::returnValue('thisIsNoHandler'));
+            ->willReturn('thisIsNoHandler');
         /** @var ContainerInterface $containerMock */
         $eventDispatcher = new ContainerAwareDispatcher($containerMock, [EventStub::class => 'eventHandler']);
 
@@ -105,7 +75,7 @@ class ContainerAwareDispatcherTest extends TestCase
         $containerMock->expects(static::once())
             ->method('get')
             ->with('eventHandler')
-            ->will(static::returnValue($eventHandler));
+            ->willReturn($eventHandler);
         /** @var ContainerInterface $containerMock */
         $subscriber = new EventSubscriberInterfaceStub([EventStub::class => 'eventHandler']);
 
